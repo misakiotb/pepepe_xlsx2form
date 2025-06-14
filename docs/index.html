@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ペペペ:Excel2Form - 使い方とサンプル</title>
+    <style>
+        body {
+            font-family: sans-serif;
+            line-height: 1.6;
+            margin: 20px;
+            max-width: 800px;
+            margin-left: auto;
+            margin-right: auto;
+            color: #333;
+        }
+        h1, h2 {
+            color: #2c3e50;
+            border-bottom: 2px solid #3498db;
+            padding-bottom: 10px;
+        }
+        h1 {
+            text-align: center;
+        }
+        a {
+            color: #3498db;
+            text-decoration: none;
+        }
+        a:hover {
+            text-decoration: underline;
+        }
+        .container {
+            background-color: #f9f9f9;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+        .button-link {
+            display: inline-block;
+            background-color: #3498db;
+            color: white;
+            padding: 10px 15px;
+            border-radius: 5px;
+            text-align: center;
+            font-size: 1.1em;
+            margin: 10px 0;
+        }
+        .button-link:hover {
+            background-color: #2980b9;
+            text-decoration: none;
+        }
+        code {
+            background-color: #eee;
+            padding: 2px 4px;
+            border-radius: 4px;
+            font-family: monospace;
+        }
+        pre {
+            background-color: #eee;
+            padding: 10px;
+            border-radius: 4px;
+            overflow-x: auto;
+        }
+        ul, ol {
+            padding-left: 20px;
+        }
+        li {
+            margin-bottom: 8px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>ペペペ:Excel2Form (Chrome拡張)</h1>
+        <p>このChrome拡張機能は、Excelファイルから指定したセルのデータを読み取り、Webフォームの対応するフィールドに自動で入力します。手作業でのコピー＆ペーストを削減し、定型的なフォーム入力作業を効率化することを目的としています。エクセル方眼のような使い方をされている非構造化データであっても、セル指定でマッピングすることで、手軽に一括コピペができます。</p>
+
+        <h2>サンプルフォーム</h2>
+        <p>拡張機能の動作を試すことができるサンプルフォームです。</p>
+        <p><a href="sample_form.html" class="button-link">サンプルフォームを開く</a></p>
+        <p>このサンプルフォームに対応するマッピングファイルは <a href="sample_form_mapping.json">sample_form_mapping.json</a> です。 (右クリックして「名前を付けてリンク先を保存」などでダウンロードしてください)</p>
+        <p>サンプルとして利用できるExcelファイルは <a href="sample_excel.xlsx" download>sample_excel.xlsx</a> です。 (クリックしてダウンロードしてください)</p>
+
+
+        <h2>使い方</h2>
+        <ol>
+            <li>
+                <strong>拡張機能のインストール</strong>:
+                <ul>
+                    <li>Chromeウェブストアから「ペペペ:Excel2Form」をインストールします。（※ストア公開後）</li>
+                    <li>または、開発者モードでこのリポジトリのソースコードを読み込みます。
+                        <ol>
+                            <li><a href="https://github.com/misakiotb/pepepe_xlsx2form" target="_blank">GitHubリポジトリ</a>をダウンロードまたはクローンします。</li>
+                            <li>Chromeブラウザで <code>chrome://extensions</code> を開きます。</li>
+                            <li>「デベロッパーモード」をオンにします。</li>
+                            <li>「パッケージ化されていない拡張機能を読み込む」ボタンをクリックし、ダウンロードしたフォルダを選択します。</li>
+                        </ol>
+                    </li>
+                </ul>
+            </li>
+            <li>
+                <strong>マッピングファイルの準備</strong>:
+                <ul>
+                    <li>入力元のExcelファイルと入力先のWebフォームに合わせて、マッピング情報を記述したJSONファイルを作成します。</li>
+                    <li>詳細は下記の「マッピング仕様」セクションを参照してください。</li>
+                </ul>
+            </li>
+            <li>
+                <strong>拡張機能の設定</strong>:
+                <ul>
+                    <li>Chromeの拡張機能アイコンをクリックしてポップアップを開きます。</li>
+                    <li>初回起動時、または「マッピングを再設定」リンクから、作成したマッピングJSONファイルをアップロードします。</li>
+                </ul>
+            </li>
+            <li>
+                <strong>フォーム入力の実行</strong>:
+                <ul>
+                    <li>データ入力対象のWebフォームのページを開きます。</li>
+                    <li>拡張機能のポップアップを開きます。</li>
+                    <li>「Excelファイルを選択」ボタンから、データが記載されたExcelファイルを選択します。</li>
+                    <li>「フォームに入力」ボタンをクリックすると、マッピングに従ってExcelのデータがフォームに自動入力されます。</li>
+                </ul>
+            </li>
+        </ol>
+
+        <h2>マッピング仕様</h2>
+        <p>マッピングファイル (JSON形式) は、以下の構造を持つオブジェクトの配列です。</p>
+        <pre><code>
+[
+  {
+    "label": "項目名（任意）",
+    "cell": "A1",
+    "formId": "form_element_id",
+    "type": "input"
+  },
+  {
+    "label": "複数セル結合項目",
+    "cell": "B2,B3",
+    "formId": "another_element_id",
+    "type": "textarea"
+  }
+  // ... 他のマッピング
+]
+        </code></pre>
+        <ul>
+            <li><code>label</code>: マッピング項目を識別するための任意の名前です（拡張機能の動作には影響しません）。</li>
+            <li><code>cell</code>:
+                <ul>
+                    <li>Excelシート上のセル番地を指定します（例: "D3", "P3"）。</li>
+                    <li>複数のセルを結合して1つの項目に入力する場合は、カンマ区切りで指定します（例: "D4,D5"）。結合された値は改行で区切られて入力されます。</li>
+                </ul>
+            </li>
+            <li><code>formId</code>: Webフォーム上の入力要素のID属性の値を指定します。</li>
+            <li><code>type</code>: 入力要素の種類を指定します。現在は <code>input</code> (テキストボックスなど)、<code>textarea</code> (複数行テキストエリア)、<code>select</code> (ドロップダウンリスト) に対応しています。</li>
+        </ul>
+
+        <h2>注意事項</h2>
+        <ul>
+            <li>Excelファイルは「.xlsx」形式のみ対応しています。</li>
+            <li>マッピングファイルで指定する <code>formId</code> は、入力対象WebフォームのHTML要素の <code>id</code> 属性と正確に一致している必要があります。ブラウザの開発者ツールなどで確認してください。</li>
+            <li>拡張機能の更新後は、Chromeの拡張機能管理画面 (<code>chrome://extensions</code>) で本拡張機能の「更新」ボタンを押すか、一度無効化してから再度有効化してください。</li>
+        </ul>
+
+        <hr>
+        <p>ご意見、ご要望、バグ報告などがありましたら、<a href="https://github.com/misakiotb/pepepe_xlsx2form/issues" target="_blank">GitHub Issues</a>までお知らせください。</p>
+    </div>
+</body>
+</html>

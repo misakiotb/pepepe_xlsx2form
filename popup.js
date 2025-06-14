@@ -71,44 +71,71 @@ document.getElementById('fillFormBtn').addEventListener('click', async () => {
     const data = new Uint8Array(e.target.result);
     const workbook = XLSX.read(data, {type: 'array'});
     const sheet = workbook.Sheets[workbook.SheetNames[0]];
-    // セル値を取得
-    const values = {
-      'B13': sheet['B13'] ? sheet['B13'].v : '',
-      'B19': sheet['B19'] ? sheet['B19'].v : '',
-      'B20': sheet['B20'] ? sheet['B20'].v : '',
-      'B21': sheet['B21'] ? sheet['B21'].v : '',
-      'B22': sheet['B22'] ? sheet['B22'].v : '',
-      'B32': sheet['B32'] ? sheet['B32'].v : '',
-      'D35': sheet['D35'] ? sheet['D35'].v : '',
-      'B33': sheet['B33'] ? sheet['B33'].v : '',
-      'B34': sheet['B34'] ? sheet['B34'].v : '',
-      'B35': sheet['B35'] ? sheet['B35'].v : '',
-      'B24': sheet['B24'] ? sheet['B24'].v : '',
-      'B28': sheet['B28'] ? sheet['B28'].v : '',
-      'D23': sheet['D23'] ? sheet['D23'].v : '',
-      'D24': sheet['D24'] ? sheet['D24'].v : '',
-      'B30': sheet['B30'] ? sheet['B30'].v : '',
-      'B26': sheet['B26'] ? sheet['B26'].v : '',
-      'B27': sheet['B27'] ? sheet['B27'].v : '',
-      'D16': sheet['D16'] ? sheet['D16'].v : '',
-      'B29': sheet['B29'] ? sheet['B29'].v : '',
-      'B31': sheet['B31'] ? sheet['B31'].v : '',
-      'B36': sheet['B36'] ? sheet['B36'].v : ''
-    };
-    // 時間外労働（B26+B27）
-    values['B26_B27'] = [values['B26'], values['B27']].filter(Boolean).join('\n');
 
-    // content_scriptに送信
-    chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
-      chrome.scripting.executeScript({
-        target: {tabId: tabs[0].id},
-        func: (vals) => {
-          window.postMessage({type: 'EXCEL_TO_FORM', values: vals}, '*');
-        },
-        args: [values]
+    // chrome.storage.localからmappingを取得して、動的にセル値を読み込む
+    chrome.storage.local.get(['mapping'], (result) => {
+      const mappingArr = (result && result.mapping) ? result.mapping : [];
+      const values = {};
+
+      if (mappingArr.length === 0) {
+        statusDiv.textContent = 'マッピングが設定されていません。設定ファイルを確認してください。';
+        console.warn('マッピングが空のため、処理を中断しました。');
+        return; // マッピングがない場合は何もしない
+      }
+
+      mappingArr.forEach(mapEntry => {
+        const cellAddress = mapEntry.cell;
+        // cellプロパティが存在しないか、文字列でない場合はスキップ
+        if (typeof cellAddress !== 'string') {
+          console.warn('無効なセルアドレスを持つマッピングエントリをスキップ:', mapEntry);
+          return; // continue の代わりに forEach の場合は return を使用
+        }
+
+        const trimmedCellAddress = cellAddress.trim();
+        if (!trimmedCellAddress) {
+            console.warn('空のセルアドレスを持つマッピングエントリをスキップ:', mapEntry);
+            return;
+        }
+
+        if (trimmedCellAddress.includes(',')) {
+          // 複数のセルがカンマ区切りで指定されている場合 (例: "D4,D5")
+          const cellParts = trimmedCellAddress.split(',');
+          const combinedValueParts = [];
+          cellParts.forEach(part => {
+            const trimmedPart = part.trim();
+            if (trimmedPart) { // 空の部品をスキップ
+                 // セルの値が存在すればその値を、なければ空文字を、数値の0も文字列として扱う
+                 const cellValue = sheet[trimmedPart] ? (sheet[trimmedPart].v !== undefined ? String(sheet[trimmedPart].v) : '') : '';
+                 combinedValueParts.push(cellValue);
+            }
+          });
+          const combinedKey = trimmedCellAddress.replace(/,/g, '_'); // 例: "D4_D5"
+          // 空文字でない値のみを結合する
+          values[combinedKey] = combinedValueParts.filter(val => val !== '').join('\n');
+        } else {
+          // 単独セルの場合
+          values[trimmedCellAddress] = sheet[trimmedCellAddress] ? (sheet[trimmedCellAddress].v !== undefined ? String(sheet[trimmedCellAddress].v) : '') : '';
+        }
       });
+
+      // content_scriptに送信
+      chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
+        if (tabs.length === 0 || !tabs[0].id) {
+          statusDiv.textContent = 'アクティブなタブが見つかりません。';
+          console.error('アクティブなタブが見つかりません。');
+          return;
+        }
+
+        chrome.scripting.executeScript({
+          target: {tabId: tabs[0].id},
+          func: (vals) => {
+            window.postMessage({type: 'EXCEL_TO_FORM', values: vals}, '*');
+          },
+          args: [values]
+        });
+      });
+      statusDiv.textContent = 'フォームに値を送信しました';
     });
-    statusDiv.textContent = 'フォームに値を送信しました';
   };
   reader.readAsArrayBuffer(fileInput.files[0]);
 });
