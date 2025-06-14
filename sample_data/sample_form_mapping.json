@@ -1,0 +1,7 @@
+[
+  { "label": "会社名", "cell": "D3", "formId": "company_name", "type": "input" },
+  { "label": "会社名（カナ）", "cell": "P3", "formId": "company_name_kana", "type": "input" },
+  { "label": "住所", "cell": "D4,D5", "formId": "address", "type": "input" },
+  { "label": "電話番号", "cell": "D6", "formId": "tel", "type": "input" },
+  { "label": "担当者", "cell": "D7", "formId": "person", "type": "input" }
+]

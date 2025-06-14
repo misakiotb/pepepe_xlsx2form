@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <title>サンプル会社フォーム</title>
+  <style>
+    body { font-family: sans-serif; margin: 40px; }
+    label { display: block; margin-top: 16px; }
+    input[type="text"] { width: 300px; padding: 4px; }
+    .form-group { margin-bottom: 12px; }
+    button { margin-top: 24px; padding: 6px 18px; }
+  </style>
+</head>
+<body>
+  <h2>サンプル会社フォーム</h2>
+  <form>
+    <div class="form-group">
+      <label for="company_name">会社名</label>
+      <input type="text" id="company_name" name="company_name">
+    </div>
+    <div class="form-group">
+      <label for="company_name_kana">会社名（カナ）</label>
+      <input type="text" id="company_name_kana" name="company_name_kana">
+    </div>
+    <div class="form-group">
+      <label for="address">住所</label>
+      <input type="text" id="address" name="address">
+    </div>
+    <div class="form-group">
+      <label for="tel">電話番号</label>
+      <input type="text" id="tel" name="tel">
+    </div>
+    <div class="form-group">
+      <label for="person">担当者</label>
+      <input type="text" id="person" name="person">
+    </div>
+    <button type="submit">送信</button>
+  </form>
+</body>
+</html>
