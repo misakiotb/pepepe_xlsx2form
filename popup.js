@@ -118,7 +118,7 @@ document.getElementById('fillFormBtn').addEventListener('click', async () => {
         }
       });
 
-      // content_scriptに送信
+      // content_scriptのロジックを直接実行
       chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
         if (tabs.length === 0 || !tabs[0].id) {
           statusDiv.textContent = 'アクティブなタブが見つかりません。';
@@ -127,14 +127,55 @@ document.getElementById('fillFormBtn').addEventListener('click', async () => {
         }
 
         chrome.scripting.executeScript({
-          target: {tabId: tabs[0].id},
-          func: (vals) => {
-            window.postMessage({type: 'EXCEL_TO_FORM', values: vals}, '*');
+          target: {tabId: tabs[0].id, allFrames: true},
+          func: (values) => {
+            // この関数はコンテンツスクリプトとしてタブのコンテキストで実行される
+            chrome.storage.local.get(['mapping'], (result) => {
+              const mappingArr = (result && result.mapping) ? result.mapping : [];
+              const mappingObj = {};
+              mappingArr.forEach(m => {
+                if (m.cell && m.cell.includes(',')) {
+                  const key = m.cell.replace(/,/g, '_');
+                  mappingObj[key] = m;
+                } else if (m.cell) {
+                  mappingObj[m.cell] = m;
+                }
+              });
+
+              for (const key in values) {
+                const val = values[key];
+                const map = mappingObj[key];
+                if (!map || !map.formId) {
+                  console.warn(`マッピングが見つからないか、formIdがありません: ${key}`);
+                  continue;
+                }
+                
+                const selector = map.formId.startsWith('#') ? map.formId : ('#' + map.formId);
+                const el = document.querySelector(selector);
+                
+                if (!el) {
+                  console.warn(`要素が見つかりません: ${selector}`);
+                  continue;
+                }
+                
+                try {
+                  if (map.type === 'input' || map.type === 'textarea') {
+                    el.value = val;
+                    el.dispatchEvent(new Event('input', { bubbles: true }));
+                  } else if (map.type === 'select') {
+                    el.value = val;
+                    el.dispatchEvent(new Event('change', { bubbles: true }));
+                  }
+                } catch (error) {
+                  console.error(`値の設定中にエラーが発生: ${selector}, ${error.message}`);
+                }
+              }
+            });
           },
           args: [values]
         });
       });
-      statusDiv.textContent = 'フォームに値を送信しました';
+      statusDiv.textContent = 'フォームへの入力が完了しました。';
     });
   };
   reader.readAsArrayBuffer(fileInput.files[0]);

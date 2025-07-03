@@ -1,10 +1,10 @@
 {
   "manifest_version": 3,
-  "name": "ペペペ：Excel2Form",
-  "version": "1.0",
-  "description": "Excel（非構造化）からフォームへ自動入力するChrome拡張",
+  "name": "ペペペExcel2Form",
+  "version": "1.0.0",
+  "description": "Excelの指定セルからWebフォームへデータを自動入力。手動コピー＆ペーストを削減し、定型作業を効率化。非構造化Excelにも対応し、マッピングで簡単一括転記！",
   "permissions": ["scripting", "activeTab", "storage"],
-  "host_permissions": ["<all_urls>"],
+  "homepage_url": "https://github.com/misakiotb/pepepe_xlsx2form",
   "action": {
     "default_popup": "popup.html",
     "default_icon": {
@@ -13,14 +13,9 @@
       "128": "icon128.png"
     }
   },
-  "background": {
-    "service_worker": "background.js"
-  },
-  "content_scripts": [
-    {
-      "matches": ["<all_urls>"],
-      "js": ["content_script.js"],
-      "all_frames": true
-    }
-  ]
+  "icons": {
+    "16": "icon16.png",
+    "48": "icon48.png",
+    "128": "icon128.png"
+  }
 }
