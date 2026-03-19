@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "ペペペExcel2Form",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "Excelの指定セルからWebフォームへデータを自動入力。手動コピー＆ペーストを削減し、定型作業を効率化。非構造化Excelにも対応し、マッピングで簡単一括転記！",
   "permissions": ["scripting", "activeTab", "storage"],
   "homepage_url": "https://github.com/misakiotb/pepepe_xlsx2form",
