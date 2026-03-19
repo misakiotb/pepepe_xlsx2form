@@ -81,12 +81,22 @@ Excel-to-Form/
 ├── manifest.json            # Chrome拡張の定義ファイル
 ├── popup.html               # 拡張機能のUI（ファイル選択、実行ボタンなど）
 ├── popup.js                 # UIの制御、Excel解析、フォーム入力スクリプトの実行など、主要なロジック
-├── xlsx.full.min.js         # Excelファイル解析ライブラリ (SheetJS)
+├── xlsx.full.min.js         # Excelファイル解析ライブラリ (SheetJS 0.20.3)
+├── package.json             # npm 依存関係（Dependabot による脆弱性監視）
+├── .github/dependabot.yml   # GitHub Dependabot 設定
+├── scripts/copy-xlsx.js     # xlsx を拡張機能用にコピーするスクリプト
 ├── icons/                   # アイコン画像
 └── docs/                    # ドキュメント、サンプルファイル
     ├── sample_form.html
     └── sample_form_mapping.json
 ```
+
+## 依存関係とセキュリティ
+
+- **xlsx (SheetJS)**: 公式 CDN から 0.20.3 を利用（CVE-2024-22363 修正済み）
+- **Dependabot**: 週次で依存関係をスキャンし、脆弱性があればプルリクエストを自動作成
+- **更新手順**: `npm install` 実行後、`scripts/copy-xlsx.js` が自動で `xlsx.full.min.js` を更新
+- **セキュリティアドバイザリ**: [SheetJS Advisories](https://cdn.sheetjs.com/advisories)
 
 ## 注意事項
 -   Excelファイルは「.xlsx」形式のみ対応しています。

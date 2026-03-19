@@ -1,0 +1,28 @@
+{
+  "name": "excel-to-form",
+  "version": "1.0.0",
+  "description": "## 概要 このChrome拡張機能は、Excelファイルから指定したセルのデータを読み取り、Webフォームの対応するフィールドに自動で入力します。 手作業でのコピー＆ペーストを削減し、定型的なフォーム入力作業を効率化することを目的としています。 エクセル方眼のような使い方をされている非構造化データであっても、セル指定でマッピングすることで、手軽に一括コピペができます。",
+  "main": "popup.js",
+  "directories": {
+    "doc": "docs"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "postinstall": "node scripts/copy-xlsx.js",
+    "update-xlsx": "node scripts/copy-xlsx.js"
+  },
+  "dependencies": {
+    "xlsx": "https://cdn.sheetjs.com/xlsx-0.20.3/xlsx-0.20.3.tgz"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/misakiotb/pepepe_xlsx2form.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/misakiotb/pepepe_xlsx2form/issues"
+  },
+  "homepage": "https://github.com/misakiotb/pepepe_xlsx2form#readme"
+}

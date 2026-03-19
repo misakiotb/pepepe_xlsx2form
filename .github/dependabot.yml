@@ -1,0 +1,12 @@
+# GitHub Dependabot 設定
+# 依存関係の脆弱性を自動検知し、プルリクエストで通知します
+# https://docs.github.com/ja/code-security/dependabot
+
+version: 2
+updates:
+  - package-ecosystem: "npm"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+    open-pull-requests-limit: 5
